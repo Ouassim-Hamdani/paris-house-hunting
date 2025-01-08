@@ -1,2 +1,3 @@
-USER,ID
-Ouassim,814952835
+USER,ID,ROLE,NOTIFY
+Ouassim,814952835,Admin,True
+HAHA,674,Member,False

@@ -3,10 +3,14 @@ import logging
 from dotenv import load_dotenv
 import subprocess
 import signal
+
+from housing.utils import register_user, is_registered, load_users, save_users,is_admin,check_notify,switch_notify
+
 load_dotenv()
-TEL_ID = int("814952835")
+#TEL_ID = int("814952835")
 BOT_TOKEN=os.environ["BOT"]
 DB_FILE = os.environ["DB"]
+USER_DB = os.environ["USER_DB"]
 LOG_FILE = os.path.join("logs","main.log")
 bot = telebot.TeleBot(BOT_TOKEN)
 
@@ -68,9 +72,19 @@ def start_server():
 
     
 # Handler for messages
-@bot.message_handler(func=lambda message: message.chat.id == TEL_ID)
+@bot.message_handler(func=lambda message: True)
 def handle_message(message):
-    if message.text.lower() == 'health':
+    user_id = message.chat.id
+    if message.text.lower() == 'register':
+        if is_registered(user_id,USER_DB):
+            bot.reply_to(message, f"You are already registerd 🤝")
+        else:
+            register_user(USER_DB,user_id,message.from_user.first_name)
+    elif not is_registered(user_id,USER_DB):
+        bot.reply_to(message,"Sorry, You have to register first ⛔!\nUse 'register'")
+        return
+    
+    elif message.text.lower() == 'health':
         health_status = check_health()
         if health_status:
             bot.reply_to(message, f"Well system seems to be online 🟢  ")
@@ -84,6 +98,9 @@ def handle_message(message):
             bot.reply_to(message, f"This is Hosue Hunting Notification System Developed by Ouassim 🤖\n📍 Location : Paris\n🏠 Supports : Arpej, Studefi, Crous & Fac-Habitat\n🔧 System : 🔴")
         logging.info(f"Info invoked by {message.from_user.first_name}.")
     elif message.text.lower()=="kill":
+        if not is_admin(user_id,USER_DB):
+            bot.reply_to(message,"Sorry, you're not an admin ⛔")
+            return
         logging.critical(f"User {message.from_user.first_name} requested to kill the main process.")
         if check_health():
             pid = get_pid()
@@ -109,6 +126,9 @@ def handle_message(message):
             logging.info("System is not online. thus cannot be killed.")
             bot.reply_to(message,"🚨 System is not online!")
     elif message.text.lower()=="start":
+        if not is_admin(user_id,USER_DB):
+            bot.reply_to(message,"Sorry, you're not an admin ⛔")
+            return
         logging.info(f"User {message.from_user.first_name} requested to start the main process.")
         if check_health():
             bot.reply_to(message,"🚨 System is already online!")
@@ -122,11 +142,14 @@ def handle_message(message):
     elif message.text.lower()=="db":
         logging.info(f"User {message.from_user.first_name} requested to access database.")
         with open(DB_FILE,"rb") as f:
-            bot.send_document(TEL_ID,f, caption="Here's your Database file!")
+            bot.send_document(user_id,f, caption="Here's your Database file!")
     elif message.text.lower()=="log":
+        if not is_admin(user_id,USER_DB):
+            bot.reply_to(message,"Sorry, you're not an admin ⛔")
+            return
         logging.info(f"User {message.from_user.first_name} requested to access logs.")
         with open(LOG_FILE,"rb") as f:
-            bot.send_document(TEL_ID,f, caption="Here's your Log file!")
+            bot.send_document(user_id,f, caption="Here's your Log file!")
     elif message.text.lower()=="help" or message.text.lower()=="cmds":
         logging.info(f"User {message.from_user.first_name} requested help with commands.")
         bot.reply_to(message, 
@@ -150,6 +173,18 @@ def handle_message(message):
         else:
             logging.error("System is not online, thus cannot be signaled, informing user to start it first..")
             bot.reply_to(message,"🚨 System is not online! Please start it first!")
+    elif message.text.lower()=="notify":
+        if not check_notify(user_id,USER_DB):
+            switch_notify(user_id,USER_DB)
+            bot.reply_to(message,"Notifications are on 🔔")
+        else:
+            bot.reply_to(message,"Notifications are already on for you 🔔")
+    elif message.text.lower()=="unnotify":
+        if check_notify(user_id,USER_DB):
+            switch_notify(user_id,USER_DB)
+            bot.reply_to(message,"Notifications are off 🔕")
+        else:
+            bot.reply_to(message,"Notifications are already off for you 🔕")
 # Start listening for messages
 logging.info("Telegram bot started.")
 bot.polling()
