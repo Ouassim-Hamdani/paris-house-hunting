@@ -45,10 +45,32 @@ def check_crous_housing(url="https://trouverunlogement.lescrous.fr/tools/37/sear
         housing_items = soup.find_all('li', class_='fr-col-12 fr-col-sm-6 fr-col-md-4 svelte-11sc5my fr-col-lg-4') 
         for item in housing_items:
             # Extract residence name
-            name = item.find('h3', class_='fr-card__title').text.strip()
+            name_item = item.find('h3', class_='fr-card__title')
+            name = name_item.text.strip()
+            url = "https://trouverunlogement.lescrous.fr"+ name_item.find("a")["href"]
+            price = item.find('p', class_='fr-badge').text.strip()
             # Extract address
             address = item.find('p', class_='fr-card__desc').text.strip()
-            housing_info.append({"name": name, "address": address,"source":"Crous"})
+            img_url = item.find('img', class_='fr-responsive-img')["src"]
+            
+            all_detail_tags = item.find('div', class_='fr-card__end').find_all('p', class_='fr-card__detail')
+
+            # Iterate through the tags to find the one that contains the room size info
+            room_size=""
+            for detail_tag in all_detail_tags:
+                if 'm²' in detail_tag.text: 
+                    room_size  = detail_tag.text.strip()
+                    break
+            
+            
+            housing_info.append({"name": name, 
+                                 "address": address,
+                                 "URL":url,
+                                 "price":price,
+                                 "source":"Crous",
+                                 "image":img_url,
+                                 "size":room_size
+                                 })
 
         return housing_info
 

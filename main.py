@@ -87,18 +87,21 @@ async def notify_check(housing_info):
     write_notifications_to_csv(updated_notifications,CSV_FILE)    
 
 
-
-
-async def notify(housing_item): # dont be confused this als onotifies all users, just for housing offers
+def create_message(housing_item):
+    """Create Message dependin on source to send to user"""
     if housing_item["source"]=="Crous":
-        message = f"🏢 Source : {housing_item["source"]}\n🏠 Residence : {housing_item["name"]}\n📍 Address : {housing_item["address"]}\n🌐 Reserve it at https://trouverunlogement.lescrous.fr/tools/37/search?bounds=2.113475940758818_49.35643927612489_2.4973107796260052_48.80505453139158"
+        message = f"🏢 Source : {housing_item["source"]}\n\n🏠 Residence : {housing_item["name"]}\n\n📍 Address : {housing_item["address"]}\n\n💰 Price : {housing_item["price"]}\n\n🧱 Size : {housing_item["size"]}\n\n🌐 Reserve it at {housing_item["URL"]}"
     elif housing_item["source"]=="Studefi":
-        message = f"🏢 Source : {housing_item["source"]}\n🏠 Residence : {housing_item["name"]}\n🌐 Reserve it at https://www.studefi.fr/main.php#listRes"
+        message = f"🏢 Source : {housing_item["source"]}\n\n🏠 Residence : {housing_item["name"]}\n\n🌐 Reserve it at https://www.studefi.fr/main.php#listRes"
     elif housing_item["source"]=="Arpej":
-        message = f"🏢 Source : {housing_item["source"]}\n🏠 Residence : {housing_item["name"]}\n📍 Address : {housing_item["address"]}\n💰 Price : {housing_item["price"]}€\n🌐 Reserve it at {housing_item["URL"]}"
+        message = f"🏢 Source : {housing_item["source"]}\n\n🏠 Residence : {housing_item["name"]}\n\n📍 Address : {housing_item["address"]}\n\n💰 Price : {housing_item["price"]}€\n\n🌐 Reserve it at {housing_item["URL"]}"
     elif housing_item["source"]=="Fac-Habitat":
-        message = f"🏢 Source : {housing_item["source"]}\n🏠 Residence : {housing_item["name"]}\n📍 Address : {housing_item["address"]}\n🔓 Availability : {housing_item["state"]}\n🌐 Reserve it at {housing_item["URL"]}"
+        message = f"🏢 Source : {housing_item["source"]}\n\n🏠 Residence : {housing_item["name"]}\n\n📍 Address : {housing_item["address"]}\n\n🔓 Availability : {housing_item["state"]}\n\n🌐 Reserve it at {housing_item["URL"]}"
+        
+    return message
+async def notify(housing_item): # dont be confused this als onotifies all users, just for housing offers
     
+    message=create_message(housing_item)
     users = load_users(USERS_DB)
     if "image" in housing_item.keys():
         for user in users.keys():
@@ -124,15 +127,7 @@ async def check_all():
 
 async def notify_user(housing_item,user):
     """For specific user, handles message creating and notifying, used in now task"""
-    if housing_item["source"]=="Crous":
-        message = f"🏢 Source : {housing_item["source"]}\n🏠 Residence : {housing_item["name"]}\n📍 Address : {housing_item["address"]}\n🌐 Reserve it at https://trouverunlogement.lescrous.fr/tools/37/search?bounds=2.113475940758818_49.35643927612489_2.4973107796260052_48.80505453139158"
-    elif housing_item["source"]=="Studefi":
-        message = f"🏢 Source : {housing_item["source"]}\n🏠 Residence : {housing_item["name"]}\n🌐 Reserve it at https://www.studefi.fr/main.php#listRes"
-    elif housing_item["source"]=="Arpej":
-        message = f"🏢 Source : {housing_item["source"]}\n🏠 Residence : {housing_item["name"]}\n📍 Address : {housing_item["address"]}\n💰 Price : {housing_item["price"]}€\n🌐 Reserve it at {housing_item["URL"]}"
-    elif housing_item["source"]=="Fac-Habitat":
-        message = f"🏢 Source : {housing_item["source"]}\n🏠 Residence : {housing_item["name"]}\n📍 Address : {housing_item["address"]}\n🔓 Availability : {housing_item["state"]}\n🌐 Reserve it at {housing_item["URL"]}"
-    
+    message=create_message(housing_item)
     if "image" in housing_item.keys():
                 await bot.send_photo(chat_id=user, photo=housing_item["image"],caption=message)
     else:

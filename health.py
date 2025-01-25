@@ -3,7 +3,7 @@ import logging
 from dotenv import load_dotenv
 import subprocess
 import signal
-
+from time import sleep
 from housing.utils import register_user, is_registered, load_users, save_users,is_admin,check_notify,switch_notify
 
 load_dotenv()
@@ -12,12 +12,20 @@ BOT_TOKEN=os.environ["BOT"]
 DB_FILE = os.environ["DB"]
 USER_DB = os.environ["USER_DB"]
 LOG_FILE = os.path.join("logs","main.log")
-bot = telebot.TeleBot(BOT_TOKEN)
 
 # Configure logging (optional but recommended)
 logging.basicConfig(filename=os.path.join("logs","health.log"), level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
+while 1: #trying to find out if this caused health to crash
+    try:
+        logging.info("Loading Bot")
+        bot = telebot.TeleBot(BOT_TOKEN)
+        break
+    except Exception as e:
+        logging.critical(f"Failed to load bot : {e}")
+        logging.critical("Will try again in 10 minutes")
+        sleep(10*60)
 # Function to check the health of your program
 def check_health():
     try:
@@ -154,12 +162,14 @@ def handle_message(message):
     elif message.text.lower()=="help" or message.text.lower()=="cmds":
         logging.info(f"User {message.from_user.first_name} requested help with commands.")
         bot.reply_to(message, 
-             "🤖 Health: Checks on the main program's execution state. 💓\n"
-             "ℹ️ Info: Gives general info on the project alongside health status. 📊\n"
-             "💀 Kill: Kills the main program. ☠️\n"
-             "🚀 Start: Starts the main program. ✨\n"
-             "💾 DB: Sends the database file. 📁\n"
-             "⏰ Now: Shows currently available offers. 🏡"
+             "🤖 Health: Checks on the main program's execution state. 💓\n\n"
+             "ℹ️ Info: Gives general info on the project alongside health status. 📊\n\n"
+             "💀 Kill: Kills the main program. ☠️\n\n"
+             "🚀 Start: Starts the main program. ✨\n\n"
+             "💾 DB: Sends the database file. 📁\n\n"
+             "⏰ Now: Shows currently available offers. 🏡\n\n"
+             "🔔 Notify: Activate notifications of available housing.\n\n"
+             "🔕 Unnotify: Deactivate notifications regarding available housing"
             )
 
     elif message.text.lower()=="now":
@@ -188,6 +198,18 @@ def handle_message(message):
             bot.reply_to(message,"Notifications are off 🔕")
         else:
             bot.reply_to(message,"Notifications are already off for you 🔕")
+    
+    else:
+        bot.reply_to(message,f"Sorry {message.from_user.first_name}, unrecognized command in your message, please type help for help.")
+        logging.info(f"User {message.from_user.first_name} sent an unusual message {message.text}")
+        
 # Start listening for messages
-logging.info("Telegram bot started.")
-bot.polling()
+logging.info("Telegram bot started listening")
+while 1:
+    try:
+        bot.polling()
+    except Exception as e:
+        logging.critical(f"Failed to listen : {e}")
+        logging.critical(f"Attempting a restart in 10 minutes")
+        sleep(10*60)
+    break
