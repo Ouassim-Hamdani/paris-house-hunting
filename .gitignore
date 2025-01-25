@@ -1,3 +1,5 @@
 .env
 old/
 test.py
+logs/health.log
+logs/main.log

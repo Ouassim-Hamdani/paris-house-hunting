@@ -75,11 +75,12 @@ def start_server():
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
     user_id = message.chat.id
-    if message.text.lower() == 'register':
+    if message.text.lower() == 'register l9baylsbabna':
         if is_registered(user_id,USER_DB):
             bot.reply_to(message, f"You are already registerd 🤝")
         else:
             register_user(USER_DB,user_id,message.from_user.first_name)
+            bot.reply_to(message,f"Welcome to users list, {message.from_user.first_name}\nYou'll be notified of future housing availabilites")
     elif not is_registered(user_id,USER_DB):
         bot.reply_to(message,"Sorry, You have to register first ⛔!\nUse 'register'")
         return
@@ -165,6 +166,8 @@ def handle_message(message):
         logging.info(f"User {message.from_user.first_name} requested to show availablities now, signaling to second process...")
         if check_health():
             try:
+                with open(os.environ["PIPE_FILE"],"w") as f:
+                    f.write(str(user_id))
                 os.kill(get_pid(),signal.SIGUSR1)
                 bot.reply_to(message,"Getting you that list!...⌛")
             except Exception as e:
