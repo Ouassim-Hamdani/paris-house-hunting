@@ -3,3 +3,5 @@ old/
 test.py
 logs/health.log
 logs/main.log
+*/__pycache__
+.venv/

@@ -212,4 +212,3 @@ while 1:
         logging.critical(f"Failed to listen : {e}")
         logging.critical(f"Attempting a restart in 10 minutes")
         sleep(10*60)
-    break
