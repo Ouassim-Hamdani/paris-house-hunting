@@ -56,14 +56,10 @@ This project is a Python-based automated housing availability checker, for stude
     ```
 
 2.  **Activate the virtual environment**:
-    -   On Windows:
-        ```bash
-        .venv\Scripts\activate
-        ```
-    -   On macOS and Linux:
-        ```bash
-        source .venv/bin/activate
-        ```
+
+    ```bash
+    source .venv/bin/activate
+    ```
 
 3.  **Install dependencies**:
     ```bash
@@ -83,9 +79,9 @@ This project is a Python-based automated housing availability checker, for stude
     -   Add your Telegram bot token to this file:
         ```
         BOT=YOUR_TELEGRAM_BOT_TOKEN
-        DB=data/database.csv
-        USER_DB=data/users.csv
-        PIPE_FILE=data/pipe_communication
+        DB="data/database.csv"
+        USER_DB="data/users.csv"
+        PIPE_FILE="data/pipe_communication"
         ```
 
 ### 3. Configuration
