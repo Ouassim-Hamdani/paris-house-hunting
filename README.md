@@ -125,12 +125,13 @@ python3 health.py
 ```
 
 ## 🤖 Usage
+In order to recieve notifications, you must register your user with the bot, using `register *password*`. Password is found in the .env file.
 
 Interact with the bot on Telegram using the following commands:
 
 | Command     | Description                                      |
 |-------------|--------------------------------------------------|
-| `Register *password*`  | Register to receive housing notifications, password in code :3       |
+| `Register *password*`  | Register to receive housing notifications, password in .env :3       |
 | `Health`    | Check the current status of the system.          |
 | `Info`      | Get information about the bot and the system.    |
 | `Notify`        | Turn on your notifications.                      |

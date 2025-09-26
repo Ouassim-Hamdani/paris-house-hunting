@@ -12,10 +12,24 @@ BOT_TOKEN=os.environ["BOT"]
 DB_FILE = os.environ["DB"]
 USER_DB = os.environ["USER_DB"]
 LOG_FILE = os.path.join("logs","main.log")
-
+PASSWD = os.environ["PASSWORD"]
 # Configure logging (optional but recommended)
 logging.basicConfig(filename=os.path.join("logs","health.log"), level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
+
+
+
+if not os.path.exists(DB_FILE):
+    with open(DB_FILE,'w',newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(["RESIDENCE","ADDRESS","SOURCE","NOTIFICATION"])
+    logging.info(f"Created missing database file at {DB_FILE}")
+if not os.path.exists(USER_DB):
+    with open(USER_DB,'w',newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(['USER','ID','ROLE','NOTIFY'])
+    logging.info(f"Created missing user database file at {USER_DB}")
+
 
 while 1: #trying to find out if this caused health to crash
     try:
@@ -83,7 +97,7 @@ def start_server():
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
     user_id = message.chat.id
-    if message.text.lower() == 'register l9baylsbabna':
+    if message.text.lower() == f'register {PASSWD}':
         if is_registered(user_id,USER_DB):
             bot.reply_to(message, f"You are already registerd 🤝")
         else:
