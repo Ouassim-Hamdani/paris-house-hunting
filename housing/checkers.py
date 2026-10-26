@@ -26,7 +26,7 @@ def check_studefi(url="https://www.studefi.fr/main.php#listRes", keyword="images
         #logging.error(f"Error While checking in Studefi : {e}")
         print(f"Error fetching {url}: {e}")
         return []
-def check_crous_housing(url="https://trouverunlogement.lescrous.fr/tools/37/search?bounds=2.113475940758818_49.35643927612489_2.4973107796260052_48.80505453139158"):
+def check_crous_housing(url="https://trouverunlogement.lescrous.fr/tools/47/search?bounds=3.6810823985044343_43.85730655173586_4.064917237371621_43.25020423714625"):
     """Fetches the CROUS page, parses the HTML, and checks for available housing."""
 
     try:
@@ -167,11 +167,11 @@ def check_arpej(api_url="https://www.arpej.fr/wp-json/sn/residences?lang=fr&disp
 
 
 def check_all_res():
-    housing_info = check_studefi()
-    housing_info_crous = check_crous_housing()
-    housing_info_arpej= check_arpej()
-    housing_info_fac = check_fac_habitat_housing()
-    housing_info.extend(housing_info_crous.copy())
-    housing_info.extend(housing_info_arpej.copy())
-    housing_info.extend(housing_info_fac.copy())
+    #housing_info = check_studefi()
+    housing_info = check_crous_housing()
+    #housing_info_arpej= check_arpej()
+    #housing_info_fac = check_fac_habitat_housing()
+    #housing_info.extend(housing_info_crous.copy())
+    #housing_info.extend(housing_info_arpej.copy())
+    #housing_info.extend(housing_info_fac.copy())
     return housing_info
