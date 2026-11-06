@@ -1,0 +1,17 @@
+services:
+  bot:
+    build: .
+    image: logement-bot:latest
+    container_name: logement-bot
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # Always keep the database inside the mounted volume, whatever .env says
+      SQLITE_PATH: /app/data/housing.sqlite3
+    volumes:
+      - ./data:/app/data
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

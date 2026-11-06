@@ -1,0 +1,10 @@
+.env
+data/
+logs/
+.venv/
+**/__pycache__/
+.git/
+old/
+docs/
+scripts/
+test.py

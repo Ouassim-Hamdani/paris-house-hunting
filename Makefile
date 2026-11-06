@@ -1,10 +1,24 @@
+.PHONY: run check stop docker-up docker-down docker-logs
+
+# ---------- Classic (uv, no Docker) ----------
 run:
-	@nohup python3 main.py </dev/null >/dev/null 2>&1 &
+	@mkdir -p logs
+	@PYTHONPATH="." nohup uv run src/app.py > logs/app.log 2>&1 &
+	@echo "Bot started in background. Logs written to logs/app.log"
+
 check:
-	@ps aux | grep "main.py" 
-	@ps aux | grep "health.py" 
-health:
-	@nohup python3 health.py </dev/null  > /dev/null 2>&1 &
-all:
-	@nohup python3 main.py </dev/null >/dev/null 2>&1 &
-	@nohup python3 health.py </dev/null  > /dev/null 2>&1 &
+	@ps aux | grep -E "src/app\.py" | grep -v grep
+
+stop:
+	@pkill -f "src/app.py" || true
+	@echo "Bot stopped."
+
+# ---------- Docker ----------
+docker-up:
+	docker compose up -d --build
+
+docker-down:
+	docker compose down
+
+docker-logs:
+	docker compose logs -f --tail=100
